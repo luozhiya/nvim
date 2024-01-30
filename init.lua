@@ -45,7 +45,7 @@ vim.opt.guifont = 'NotoSansM Nerd Font Mono:h16'
 -- vim.cmd([[filetype plugin indent on]]) -- use language‐specific plugins for indenting (better):
 -- autoindent = true, -- reproduce the indentation of the previous line
 local vim_opts = {
-  -- shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
+  shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
   lazyredraw = not jit.os:find('Windows'), -- no redraws in macros. Disabled for: https://github.com/neovim/neovim/issues/22674
   clipboard = 'unnamedplus', -- Allows neovim to access the system clipboard
   -- Appearance
