@@ -39,14 +39,14 @@ vim.opt.rtp:prepend(lazypath)
 -------------------------------------------------------------------------------
 
 -- Font
-vim.opt.guifont = 'NotoSansM Nerd Font Mono:h16'
+vim.opt.guifont = 'NotoSansM Nerd Font:h16'
 
 -- Neovim default
 -- vim.cmd([[filetype plugin indent on]]) -- use language‐specific plugins for indenting (better):
 -- autoindent = true, -- reproduce the indentation of the previous line
 local vim_opts = {
-  autochdir = true,
-  shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
+  -- autochdir = true,
+  -- shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
   lazyredraw = not jit.os:find('Windows'), -- no redraws in macros. Disabled for: https://github.com/neovim/neovim/issues/22674
   clipboard = 'unnamedplus', -- Allows neovim to access the system clipboard
   -- Appearance
@@ -393,7 +393,8 @@ require('lazy').setup({
       'MunifTanjim/nui.nvim',
     },
     keys = {
-      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1]}) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>fE', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
       { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
       { '<leader>be', function() require('neo-tree.command').execute({ source = 'buffers', toggle = true }) end, desc = 'Buffer explorer' },
     },
@@ -401,7 +402,13 @@ require('lazy').setup({
       vim.cmd([[
         highlight NeoTreeWinSeparator guifg=#363636 ctermfg=235 guibg=#363636 ctermbg=235 gui=NONE cterm=NONE
       ]])
-      require('neo-tree').setup()
+      require('neo-tree').setup({
+        filesystem = {
+          bind_to_cwd = false,
+          follow_current_file = { enabled = true },
+          use_libuv_file_watcher = true,
+        },        
+      })
     end,
   },
   {
