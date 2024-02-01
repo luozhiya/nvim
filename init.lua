@@ -45,6 +45,7 @@ vim.opt.guifont = 'NotoSansM Nerd Font Mono:h16'
 -- vim.cmd([[filetype plugin indent on]]) -- use language‐specific plugins for indenting (better):
 -- autoindent = true, -- reproduce the indentation of the previous line
 local vim_opts = {
+  autochdir = true,
   shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
   lazyredraw = not jit.os:find('Windows'), -- no redraws in macros. Disabled for: https://github.com/neovim/neovim/issues/22674
   clipboard = 'unnamedplus', -- Allows neovim to access the system clipboard
@@ -375,9 +376,37 @@ require('lazy').setup({
     keys = {
       { '<leader>,', '<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>', desc = 'Switch Buffer' },
       { '<leader>:', '<cmd>Telescope command_history<cr>', desc = 'Command History' },
-      { '<leader>fg', '<cmd>Telescope git_files<cr>', desc = 'Find Files (git-files)' },
+      { '<leader>ff', '<cmd>Telescope find_files<cr>', desc = 'Find Files' },
       { '<leader>fr', '<cmd>Telescope oldfiles<cr>', desc = 'Recent' },
+      { '<leader>fd', '<cmd>Telescope lsp_document_symbols<cr>', desc = 'Document Symbols' },
+      { '<leader>fi', '<cmd>Telescope lsp_implementations<cr>', desc = 'Implementations' },
+      { '<leader>fs', '<cmd>Telescope lsp_workspace_symbols<cr>', desc = 'Workspace Symbols' },
+      { '<leader>fD', '<cmd>Telescope diagnostics<cr>', desc = 'Diagnostics' },
+      { '<leader>fg', '<cmd>Telescope git_files<cr>', desc = 'Find Files (git-files)' },
     },
+    config = true,
+  },
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+    },
+    keys = {
+      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
+      { '<leader>be', function() require('neo-tree.command').execute({ source = 'buffers', toggle = true }) end, desc = 'Buffer explorer' },
+    },
+    config = function()
+      vim.cmd([[
+        highlight NeoTreeWinSeparator guifg=#363636 ctermfg=235 guibg=#363636 ctermbg=235 gui=NONE cterm=NONE
+      ]])
+      require('neo-tree').setup()
+    end,
+  },
+  {
+    'fedepujol/move.nvim',
+    cmd = { 'MoveLine', 'MoveBlock', 'MoveHChar', 'MoveHBlock' },
   },
 }, {
   root = vim.fn.stdpath('config') .. '/lazy',
@@ -404,6 +433,22 @@ map('n', '<c-j>', '15gj', 'Move Down 15 Lines')
 map('n', '<c-k>', '15gk', 'Move Up 15 Lines')
 map('v', '<c-j>', '15gj', 'Move Down 15 Lines')
 map('v', '<c-k>', '15gk', 'Move Up 15 Lines')
+
+-- Move to window using the <ctrl> hjkl keys
+map('n', '<C-h>', '<C-w>h', { desc = 'Go to left window', remap = true })
+-- map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })
+-- map("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
+map('n', '<C-l>', '<C-w>l', { desc = 'Go to right window', remap = true })
+
+-- Selection/ Move Lines
+map('n', '<a-j>', '<cmd>MoveLine(1)<cr>', 'Line: Move Up (move.nvim)')
+map('n', '<a-k>', '<cmd>MoveLine(-1)<cr>', 'Line: Move Down (move.nvim)')
+map('n', '<a-h>', '<cmd>MoveHChar(-1)<cr>', 'Line: Move Left (move.nvim)')
+map('n', '<a-l>', '<cmd>MoveHChar(1)<cr>', 'Line: Move Right (move.nvim)')
+map('v', '<a-j>', ':MoveBlock(1)<cr>', 'Block: Move Up (move.nvim)')
+map('v', '<a-k>', ':MoveBlock(-1)<cr>', 'Block: Move Down (move.nvim)')
+map('v', '<a-h>', ':MoveHBlock(-1)<cr>', 'Block: Move Left (move.nvim)')
+map('v', '<a-l>', ':MoveHBlock(1)<cr>', 'Block: Move Right (move.nvim)')
 
 -- Better indenting
 map('v', '<', '<gv', 'deIndent Continuously')
