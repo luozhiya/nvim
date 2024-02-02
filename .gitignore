@@ -3,3 +3,4 @@ local/
 lazy/
 neovim/
 nvim/
+lsp/

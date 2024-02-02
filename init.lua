@@ -303,10 +303,13 @@ function def_lsp()
     require('clangd_extensions.inlay_hints').set_inlay_hints()
   end
 
-  require('lspconfig').clangd.setup({
-    on_attach = on_attach,
-    capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities()),
-  })
+  local servers = { 'clangd', 'lua_ls' }
+  for _, name in ipairs(servers) do
+    require("lspconfig")[name].setup({
+      on_attach = on_attach,
+      capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities()),
+    })
+  end
   require('clangd_extensions').setup()
 
   --[[
@@ -360,6 +363,7 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       'p00f/clangd_extensions.nvim',
+      { "folke/neodev.nvim", opts = {} },
     },
     config = def_lsp,
   },
@@ -415,13 +419,24 @@ require('lazy').setup({
     'fedepujol/move.nvim',
     cmd = { 'MoveLine', 'MoveBlock', 'MoveHChar', 'MoveHBlock' },
   },
+  {
+    dir = "D:/Source/fittencode.nvim",
+    config = function()
+      require('fittencode').setup()
+    end,
+  },
 }, {
   root = vim.fn.stdpath('config') .. '/lazy',
+  dev = {
+    path = "D:/Source",
+  },
 })
 
 -------------------------------------------------------------------------------
 -- Keymap
 -------------------------------------------------------------------------------
+
+map('n', '<leader>v', function() vim.cmd('e ' .. vim.fn.stdpath('config') .. '/init.lua') end, 'Edit init.lua')
 
 -- M.map('n', ';', ':') -- BUG: don't show ':' sometimes
 vim.cmd([[
