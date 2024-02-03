@@ -338,6 +338,7 @@ require('lazy').setup({
   },
   {
     'hrsh7th/nvim-cmp',
+    enabled = false,
     event = 'VeryLazy',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
@@ -361,6 +362,7 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
+    enabled = false,
     dependencies = {
       'p00f/clangd_extensions.nvim',
       { "folke/neodev.nvim", opts = {} },
@@ -420,7 +422,8 @@ require('lazy').setup({
     cmd = { 'MoveLine', 'MoveBlock', 'MoveHChar', 'MoveHBlock' },
   },
   {
-    dir = "D:/Source/fittencode.nvim",
+    -- dir = "D:/Source/fittencode.nvim",
+    dir = "/home/qx/DataCenter/onWorking/fittencode.nvim",
     config = function()
       require('fittencode').setup()
     end,
