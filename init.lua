@@ -338,7 +338,7 @@ require('lazy').setup({
   },
   {
     'hrsh7th/nvim-cmp',
-    enabled = false,
+    -- enabled = false,
     event = 'VeryLazy',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
@@ -362,7 +362,7 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
-    enabled = false,
+    -- enabled = false,
     dependencies = {
       'p00f/clangd_extensions.nvim',
       { "folke/neodev.nvim", opts = {} },
