@@ -4,10 +4,18 @@
 -- 1. C/C++/JS/Java/Python/Markdown
 -- 2. Simple
 -- 3. Less dependencies
+-- 
+-- Outline
+-- 1. Lazy
+-- 2. Option
+-- 3. Definition
+-- 4. Plugins
+-- 5. Keymap
+-- 6. Autocmds
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
--- Lazy
+-- 1. Lazy
 -------------------------------------------------------------------------------
 
 os.setlocale('C')
@@ -35,11 +43,11 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -------------------------------------------------------------------------------
--- Option
+-- 2. Option
 -------------------------------------------------------------------------------
 
 -- Font
-vim.opt.guifont = 'NotoSansM Nerd Font:h16'
+vim.opt.guifont = 'NotoSansM Nerd Font:h13'
 
 -- Neovim default
 -- vim.cmd([[filetype plugin indent on]]) -- use language‐specific plugins for indenting (better):
@@ -135,8 +143,12 @@ vim.cmd([[
   aunmenu PopUp.-1-
 ]])
 
+vim.g.neovide_refresh_rate_idle = 5
+vim.g.neovide_no_idle = true
+vim.g.neovide_input_ime = true
+
 -------------------------------------------------------------------------------
--- Definition
+-- 3. Definition
 -------------------------------------------------------------------------------
 
 function map(mode, lhs, rhs, opts)
@@ -147,191 +159,69 @@ function map(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
-function def_cmp()
-  local cmp = require('cmp')
-  -- For instance, you can set the `buffer`'s source `group_index` to a larger number
-  -- if you don't want to see `buffer` source items while `nvim-lsp` source is available:
-  local sources_presets = {
-    { name = 'nvim_lsp', group_index = 1 },
-    { name = 'luasnip', group_index = 1 },
-    { name = 'buffer', group_index = 1 },
-    {
-      name = 'dictionary',
-      keyword_length = 4,
-      group_index = 1,
-    },
-    { name = 'path', group_index = 1 },
-  }
-  local function _forward()
-    return cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif require('luasnip').expand_or_jumpable() then
-        require('luasnip').expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' })
-  end
-  local function _backward()
-    return cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif require('luasnip').jumpable(-1) then
-        require('luasnip').jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' })
-  end
-  local opts = {
-    sources = sources_presets,
-    snippet = {
-      -- REQUIRED - you must specify a snippet engine
-      expand = function(args) require('luasnip').lsp_expand(args.body) end,
-    },
-    mapping = {
-      ['<c-b>'] = cmp.mapping.scroll_docs(-4),
-      ['<c-f>'] = cmp.mapping.scroll_docs(4),
-      ['<up>'] = cmp.mapping.select_prev_item(),
-      ['<down>'] = cmp.mapping.select_next_item(),
-      ['<tab>'] = _forward(),
-      ['<s-tab>'] = _backward(),
-    },
-  }
-  cmp.setup(opts)
-
-  cmp.setup.cmdline(':', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = cmp.config.sources({
-      { name = 'path' },
-      { name = 'cmdline', option = { ignore_cmds = { 'Man', '!' } } },
-    }),
-  })
-  cmp.setup.cmdline('/', {
-    mapping = cmp.mapping.preset.cmdline(),
-    sources = { { name = 'buffer' } },
-  })
-  --[[
-    sudo apt install aspell aspell-en        
-    aspell -d en dump master | aspell -l en expand > words_aspell.txt
-  ]]
-  require('cmp_dictionary').setup({
-    paths = { vim.fn.stdpath('config') .. '/runtime/words_aspell.txt' },
-  })
-end
-
-function def_treesitter()
-  local path = vim.fn.stdpath('config') .. '/parsers'
-  local opts = {
-    parser_install_dir = path,
-    ensure_installed = {
-      'bash',
-      -- 'fish',
-      'c',
-      'cmake',
-      'cpp',
-      -- 'html',
-      'javascript',
-      -- 'json',
-      'lua',
-      'luadoc',
-      -- 'markdown_inline',
-      'markdown', -- LSP Hover
-      'python',
-      'query', -- Neovim Treesitter Playground
-      'regex',
-      -- 'rust',
-      -- 'typescript',
-      -- 'vim',
-      'vimdoc',
-      -- 'yaml',
-    },
-  }
-  require('nvim-treesitter.install').prefer_git = true
-  vim.opt.runtimepath:append(path)
-  require('nvim-treesitter.configs').setup(opts)
-end
-
-function def_godbolt()
-  local opts = {
-    languages = {
-      cpp = { compiler = 'clangdefault', options = {} },
-      c = { compiler = 'cclangdefault', options = {} },
-    }, -- vc2017_64
-    url = 'http://localhost:10240', -- https://godbolt.org
-    quickfix = {
-      enable = false, -- whether to populate the quickfix list in case of errors
-      auto_open = false, -- whether to open the quickfix list in case of errors
-    },
-  }
-  require('godbolt').setup(opts)
-end
-
-function def_lsp()
-  vim.lsp.set_log_level('OFF')
-
-  local diagnostics = {
-    virtual_text = false,
-    signs = false,
-    float = {
-      source = 'always',
-    },
-    update_in_insert = false,
-    underline = {
-      severity_limit = 'Error',
-    },
-    severity_sort = true,
-    right_align = true,
-  }
-  vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'single' })
-  vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, diagnostics)
-  vim.diagnostic.config(diagnostics)
-
-  local function on_attach(client, buffer)
-    local function _opts(desc) return { buffer = buffer, desc = desc } end
-    map('n', 'gl', '<cmd>lua vim.diagnostic.open_float({ border = "rounded", max_width = 100 })<cr>', _opts('Line Diagnostics'))
-    map('n', 'K', vim.lsp.buf.hover, _opts('Hover'))
-    map('n', 'gK', vim.lsp.buf.signature_help, _opts('Signature Help'))
-    map('n', 'gn', vim.lsp.buf.rename, _opts('Rename'))
-    map('n', 'gr', vim.lsp.buf.references, _opts('References'))
-    map('n', 'gd', function() require('telescope.builtin').lsp_definitions({ reuse_win = true }) end, _opts('Goto Definition'))
-    map({ 'n', 'v' }, 'ga', vim.lsp.buf.code_action, _opts('Code Action'))
-    map('x', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Range'))
-    map('n', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Document'))
-    require('clangd_extensions.inlay_hints').setup_autocmd()
-    require('clangd_extensions.inlay_hints').set_inlay_hints()
-  end
-
-  local servers = { 'clangd', 'lua_ls' }
-  for _, name in ipairs(servers) do
-    require("lspconfig")[name].setup({
-      on_attach = on_attach,
-      capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities()),
-    })
-  end
-  require('clangd_extensions').setup()
-
-  --[[
-    Visual Assist X Dark
-    #FFD700   Classes,structs, enums, interfaces, typedefs
-    #BDB76B   variables
-    #BD63C5   Preprocessor macros
-    #B9771E   Enum members
-    #FF8000   Functions / methods
-    #B8D7A3   Namespaces
-  ]]
-  vim.cmd([[
-    hi @lsp.type.namespace ctermfg=Yellow guifg=#BBBB00 cterm=none gui=none
-    hi @lsp.type.type ctermfg=Yellow guifg=#FFD700 cterm=none gui=none
-  ]])
-end
-
 -------------------------------------------------------------------------------
--- Plugins
+-- 4. Plugins
+--
+-- UI
+--   vscode.nvim
+--   neo-tree.nvim
+--     nui.nvim
+--     plenary.nvim
+-- Editor
+--   which-key
+--   nvim-cmp
+--     cmp-nvim-lsp
+--     cmp-buffer
+--     cmp-cmdline
+--     cmp-path
+--     cmp-luasnip
+--     LuaSnip
+--     cmp-dictionary
+--   nvim-treesitter
+--   telescope.nvim
+--     plenary.nvim
+--     project.nvim
+--   move.nvim
+-- Coding
+--   nvim-lspconfig
+--     clangd_extensions.nvim
+--   godbolt.nvim
+--   fittencode.nvim
 -------------------------------------------------------------------------------
 
 require('lazy').setup({
+  {
+    'Mofiqul/vscode.nvim',
+    config = function() require('vscode').load() end,
+    lazy = false,
+    priority = 1000,
+  },
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      'nvim-lua/plenary.nvim',
+    },
+    keys = {
+      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1] }) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>fE', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
+      { '<leader>be', function() require('neo-tree.command').execute({ source = 'buffers', toggle = true }) end, desc = 'Buffer explorer' },
+    },
+    config = function()
+      vim.cmd([[
+        highlight NeoTreeWinSeparator guifg=#363636 ctermfg=235 guibg=#363636 ctermbg=235 gui=NONE cterm=NONE
+      ]])
+      require('neo-tree').setup({
+        close_if_last_window = true,
+        filesystem = {
+          bind_to_cwd = false,
+          follow_current_file = { enabled = true },
+          use_libuv_file_watcher = true,
+        },
+      })
+    end,
+  },  
   {
     'folke/which-key.nvim',
     config = true,
@@ -349,35 +239,132 @@ require('lazy').setup({
       'L3MON4D3/LuaSnip',
       'uga-rosa/cmp-dictionary',
     },
-    config = def_cmp,
+    config = function()
+      local cmp = require('cmp')
+      -- For instance, you can set the `buffer`'s source `group_index` to a larger number
+      -- if you don't want to see `buffer` source items while `nvim-lsp` source is available:
+      local sources_presets = {
+        { name = 'nvim_lsp', group_index = 1 },
+        { name = 'luasnip', group_index = 1 },
+        { name = 'buffer', group_index = 1 },
+        {
+          name = 'dictionary',
+          keyword_length = 4,
+          group_index = 1,
+        },
+        { name = 'path', group_index = 1 },
+      }
+      local function _forward()
+        return cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif require('luasnip').expand_or_jumpable() then
+            require('luasnip').expand_or_jump()
+          else
+            fallback()
+          end
+        end, { 'i', 's' })
+      end
+      local function _backward()
+        return cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif require('luasnip').jumpable(-1) then
+            require('luasnip').jump(-1)
+          else
+            fallback()
+          end
+        end, { 'i', 's' })
+      end
+      local opts = {
+        sources = sources_presets,
+        snippet = {
+          -- REQUIRED - you must specify a snippet engine
+          expand = function(args) require('luasnip').lsp_expand(args.body) end,
+        },
+        mapping = {
+          ['<c-b>'] = cmp.mapping.scroll_docs(-4),
+          ['<c-f>'] = cmp.mapping.scroll_docs(4),
+          ['<up>'] = cmp.mapping.select_prev_item(),
+          ['<down>'] = cmp.mapping.select_next_item(),
+          ['<tab>'] = _forward(),
+          ['<s-tab>'] = _backward(),
+        },
+      }
+      cmp.setup(opts)
+
+      cmp.setup.cmdline(':', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = 'path' },
+          { name = 'cmdline', option = { ignore_cmds = { 'Man', '!' } } },
+        }),
+      })
+      cmp.setup.cmdline('/', {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = { { name = 'buffer' } },
+      })
+      --[[
+        sudo apt install aspell aspell-en        
+        aspell -d en dump master | aspell -l en expand > words_aspell.txt
+      ]]
+      require('cmp_dictionary').setup({
+        paths = { vim.fn.stdpath('config') .. '/runtime/words_aspell.txt' },
+      })
+    end,
   },
   {
     'nvim-treesitter/nvim-treesitter',
-    config = def_treesitter,
-  },
-  {
-    'p00f/godbolt.nvim',
-    cmd = { 'Godbolt' },
-    config = def_godbolt,
-  },
-  {
-    'neovim/nvim-lspconfig',
-    -- enabled = false,
-    dependencies = {
-      'p00f/clangd_extensions.nvim',
-      { "folke/neodev.nvim", opts = {} },
-    },
-    config = def_lsp,
-  },
-  {
-    'Mofiqul/vscode.nvim',
-    config = function() require('vscode').load() end,
+    config = function()
+      local path = vim.fn.stdpath('config') .. '/parsers'
+      local opts = {
+        highlight = { enable = true },
+        indent = { enable = true },
+        parser_install_dir = path,
+        ensure_installed = {
+          'bash',
+          'c',
+          'cmake',
+          'cpp',
+          'html',
+          'java',
+          'javascript',
+          'json',
+          'lua',
+          'luadoc',
+          'markdown_inline',
+          'markdown', -- LSP Hover
+          'python',
+          'query', -- Neovim Treesitter Playground
+          'regex',
+          'rust',
+          'toml',
+          'typescript',
+          'vim',
+          'vimdoc',
+          'yaml',
+        },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<C-space>',
+            node_incremental = '<C-space>',
+            scope_incremental = false,
+            node_decremental = '<bs>',
+          },
+        },
+      }
+      require('nvim-treesitter.install').prefer_git = true
+      vim.opt.runtimepath:append(path)
+      require('nvim-treesitter.configs').setup(opts)
+    end,
   },
   {
     'nvim-telescope/telescope.nvim',
     cmd = 'Telescope',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      'ahmedkhalf/project.nvim',
     },
     keys = {
       { '<leader>,', '<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>', desc = 'Switch Buffer' },
@@ -390,31 +377,10 @@ require('lazy').setup({
       { '<leader>fD', '<cmd>Telescope diagnostics<cr>', desc = 'Diagnostics' },
       { '<leader>fg', '<cmd>Telescope git_files<cr>', desc = 'Find Files (git-files)' },
     },
-    config = true,
-  },
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'MunifTanjim/nui.nvim',
-    },
-    keys = {
-      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1]}) end, desc = 'Explorer NeoTree (cwd)' },
-      { '<leader>fE', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
-      { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
-      { '<leader>be', function() require('neo-tree.command').execute({ source = 'buffers', toggle = true }) end, desc = 'Buffer explorer' },
-    },
     config = function()
-      vim.cmd([[
-        highlight NeoTreeWinSeparator guifg=#363636 ctermfg=235 guibg=#363636 ctermbg=235 gui=NONE cterm=NONE
-      ]])
-      require('neo-tree').setup({
-        filesystem = {
-          bind_to_cwd = false,
-          follow_current_file = { enabled = true },
-          use_libuv_file_watcher = true,
-        },        
-      })
+      require('telescope').setup()
+      require('project_nvim').setup()
+      require('telescope').load_extension('projects')
     end,
   },
   {
@@ -422,21 +388,103 @@ require('lazy').setup({
     cmd = { 'MoveLine', 'MoveBlock', 'MoveHChar', 'MoveHBlock' },
   },
   {
-    -- dir = "D:/Source/fittencode.nvim",
-    dir = "/home/qx/DataCenter/onWorking/fittencode.nvim",
+    'neovim/nvim-lspconfig',
+    -- enabled = false,
+    dependencies = {
+      'p00f/clangd_extensions.nvim',
+      { 'folke/neodev.nvim', opts = {} },
+    },
     config = function()
-      require('fittencode').setup()
+      vim.lsp.set_log_level('OFF')
+
+      local diagnostics = {
+        virtual_text = false,
+        signs = false,
+        float = {
+          source = 'always',
+        },
+        update_in_insert = false,
+        underline = {
+          severity_limit = 'Error',
+        },
+        severity_sort = true,
+        right_align = true,
+      }
+      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'single' })
+      vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, diagnostics)
+      vim.diagnostic.config(diagnostics)
+
+      local function on_attach(client, buffer)
+        local function _opts(desc) return { buffer = buffer, desc = desc } end
+        map('n', 'gl', '<cmd>lua vim.diagnostic.open_float({ border = "rounded", max_width = 100 })<cr>', _opts('Line Diagnostics'))
+        map('n', 'K', vim.lsp.buf.hover, _opts('Hover'))
+        map('n', 'gK', vim.lsp.buf.signature_help, _opts('Signature Help'))
+        map('n', 'gn', vim.lsp.buf.rename, _opts('Rename'))
+        map('n', 'gr', vim.lsp.buf.references, _opts('References'))
+        map('n', 'gd', function() require('telescope.builtin').lsp_definitions({ reuse_win = true }) end, _opts('Goto Definition'))
+        map({ 'n', 'v' }, 'ga', vim.lsp.buf.code_action, _opts('Code Action'))
+        map('x', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Range'))
+        map('n', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Document'))
+        require('clangd_extensions.inlay_hints').setup_autocmd()
+        require('clangd_extensions.inlay_hints').set_inlay_hints()
+      end
+
+      local servers = { 'clangd', 'lua_ls' }
+      for _, name in ipairs(servers) do
+        require('lspconfig')[name].setup({
+          on_attach = on_attach,
+          capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities()),
+        })
+      end
+      require('clangd_extensions').setup()
+
+      --[[
+        Visual Assist X Dark
+        #FFD700   Classes,structs, enums, interfaces, typedefs
+        #BDB76B   variables
+        #BD63C5   Preprocessor macros
+        #B9771E   Enum members
+        #FF8000   Functions / methods
+        #B8D7A3   Namespaces
+      ]]
+      vim.cmd([[
+        hi @lsp.type.namespace ctermfg=Yellow guifg=#BBBB00 cterm=none gui=none
+        hi @lsp.type.type ctermfg=Yellow guifg=#FFD700 cterm=none gui=none
+      ]])
     end,
+  },  
+  {
+    'p00f/godbolt.nvim',
+    cmd = { 'Godbolt' },
+    config = function()
+      local opts = {
+        languages = {
+          cpp = { compiler = 'clangdefault', options = {} },
+          c = { compiler = 'cclangdefault', options = {} },
+        }, -- vc2017_64
+        url = 'http://localhost:10240', -- https://godbolt.org
+        quickfix = {
+          enable = false, -- whether to populate the quickfix list in case of errors
+          auto_open = false, -- whether to open the quickfix list in case of errors
+        },
+      }
+      require('godbolt').setup(opts)
+    end,
+  },
+  {
+    -- dir = "D:/Source/fittencode.nvim",
+    dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
+    config = function() require('fittencode').setup() end,
   },
 }, {
   root = vim.fn.stdpath('config') .. '/lazy',
   dev = {
-    path = "D:/Source",
+    path = 'D:/Source',
   },
 })
 
 -------------------------------------------------------------------------------
--- Keymap
+-- 5. Keymap
 -------------------------------------------------------------------------------
 
 map('n', '<leader>v', function() vim.cmd('e ' .. vim.fn.stdpath('config') .. '/init.lua') end, 'Edit init.lua')
@@ -498,9 +546,6 @@ map({ 'i', 'n' }, '<esc>', '<cmd>noh<cr><esc>', 'Escape And Clear hlsearch')
 map({ 'n', 'x' }, 'gw', '*N', 'Search word under cursor')
 
 -------------------------------------------------------------------------------
--- Autocmds
+-- 6. Autocmds
 -------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
--- Color Scheme
--------------------------------------------------------------------------------
