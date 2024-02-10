@@ -405,7 +405,7 @@ require('lazy').setup({
         },
         update_in_insert = false,
         underline = {
-          severity_limit = 'Error',
+          min = vim.diagnostic.severity.ERROR
         },
         severity_sort = true,
         right_align = true,
@@ -472,15 +472,12 @@ require('lazy').setup({
     end,
   },
   {
-    -- dir = "D:/Source/fittencode.nvim",
-    dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
+    dir = "C:/DataCenter/onWorking/fittencode.nvim",
+    -- dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
     config = function() require('fittencode').setup() end,
   },
 }, {
   root = vim.fn.stdpath('config') .. '/lazy',
-  dev = {
-    path = 'D:/Source',
-  },
 })
 
 -------------------------------------------------------------------------------
