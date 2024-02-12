@@ -203,8 +203,7 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim',
     },
     keys = {
-      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1] }) end, desc = 'Explorer NeoTree (cwd)' },
-      { '<leader>fE', function() require('neo-tree.command').execute({ toggle = true, dir = vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
+      { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1] or vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
       { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
       { '<leader>be', function() require('neo-tree.command').execute({ source = 'buffers', toggle = true }) end, desc = 'Buffer explorer' },
     },
