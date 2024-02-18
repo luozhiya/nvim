@@ -4,7 +4,7 @@
 -- 1. C/C++/JS/Java/Python/Markdown
 -- 2. Simple
 -- 3. Less dependencies
--- 
+--
 -- Outline
 -- 1. Lazy
 -- 2. Option
@@ -220,7 +220,7 @@ require('lazy').setup({
         },
       })
     end,
-  },  
+  },
   {
     'folke/which-key.nvim',
     config = true,
@@ -404,7 +404,7 @@ require('lazy').setup({
         },
         update_in_insert = false,
         underline = {
-          min = vim.diagnostic.severity.ERROR
+          min = vim.diagnostic.severity.ERROR,
         },
         severity_sort = true,
         right_align = true,
@@ -451,7 +451,7 @@ require('lazy').setup({
         hi @lsp.type.type ctermfg=Yellow guifg=#FFD700 cterm=none gui=none
       ]])
     end,
-  },  
+  },
   {
     'p00f/godbolt.nvim',
     cmd = { 'Godbolt' },
@@ -471,7 +471,8 @@ require('lazy').setup({
     end,
   },
   {
-    dir = "C:/DataCenter/onWorking/fittencode.nvim",
+    dir = 'D:/Source/fittencode.nvim',
+    -- dir = "C:/DataCenter/onWorking/fittencode.nvim",
     -- dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
     config = function() require('fittencode').setup() end,
   },
@@ -544,4 +545,3 @@ map({ 'n', 'x' }, 'gw', '*N', 'Search word under cursor')
 -------------------------------------------------------------------------------
 -- 6. Autocmds
 -------------------------------------------------------------------------------
-
