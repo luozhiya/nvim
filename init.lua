@@ -391,7 +391,15 @@ require('lazy').setup({
     -- enabled = false,
     dependencies = {
       'p00f/clangd_extensions.nvim',
-      { 'folke/neodev.nvim', opts = {} },
+      {
+        'folke/neodev.nvim',
+        opts = {
+          -- library = {
+          --   vim.env.VIMRUNTIME,
+          --   '${3rd}/luv/library',
+          -- },
+        },
+      },
     },
     config = function()
       vim.lsp.set_log_level('OFF')
@@ -422,8 +430,8 @@ require('lazy').setup({
         map('n', 'gr', vim.lsp.buf.references, _opts('References'))
         map('n', 'gd', function() require('telescope.builtin').lsp_definitions({ reuse_win = true }) end, _opts('Goto Definition'))
         map({ 'n', 'v' }, 'ga', vim.lsp.buf.code_action, _opts('Code Action'))
-        map('x', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Range'))
-        map('n', '<leader>cf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Document'))
+        map('x', '<leader>lf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Range'))
+        map('n', '<leader>lf', function() vim.lsp.buf.format({ bufnr = buffer, force = true }) end, _opts('Format Document'))
         require('clangd_extensions.inlay_hints').setup_autocmd()
         require('clangd_extensions.inlay_hints').set_inlay_hints()
       end
@@ -450,6 +458,11 @@ require('lazy').setup({
         hi @lsp.type.namespace ctermfg=Yellow guifg=#BBBB00 cterm=none gui=none
         hi @lsp.type.type ctermfg=Yellow guifg=#FFD700 cterm=none gui=none
       ]])
+
+      -- Set background color for LSP hover floating windows
+      vim.api.nvim_set_hl(0, 'NormalFloat', {
+        bg = '#252526',
+      })
     end,
   },
   {
@@ -472,9 +485,21 @@ require('lazy').setup({
   },
   {
     dir = 'D:/Source/fittencode.nvim',
-    -- dir = "C:/DataCenter/onWorking/fittencode.nvim",
-    -- dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
-    config = function() require('fittencode').setup() end,
+    -- dir = function()
+    --   if vim.fn.has('win32') == 1 then
+    --     return 'C:/DataCenter/onWorking/fittencode.nvim'
+    --   else
+    --     return '/home/qx/DataCenter/onWorking/fittencode.nvim'
+    --   end
+    -- end,
+    config = function()
+      local fitten = require('fittencode')
+      fitten.setup({
+        log = {
+          level = vim.log.levels.TRACE,
+        },
+      })
+    end,
   },
 }, {
   root = vim.fn.stdpath('config') .. '/lazy',
