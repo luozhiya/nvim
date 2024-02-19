@@ -151,7 +151,7 @@ vim.g.neovide_input_ime = true
 -- 3. Definition
 -------------------------------------------------------------------------------
 
-function map(mode, lhs, rhs, opts)
+local function map(mode, lhs, rhs, opts)
   opts = opts or {}
   if type(opts) == 'string' then opts = { desc = opts } end
   if opts.silent == nil then opts.silent = true end
