@@ -46,6 +46,40 @@ vim.opt.rtp:prepend(lazypath)
 -- 2. Option
 -------------------------------------------------------------------------------
 
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_pythonx_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.editorconfig = false
+
+local disabled_built_ins = {
+  'gzip',
+  'man',
+  'matchit',
+  'matchparen',
+  'shada_plugin',
+  'tarPlugin',
+  'zipPlugin',
+  'netrwPlugin',
+  'spellfile_plugin',
+  '2html_plugin',
+  'tutor_mode_plugin',
+  'remote_plugins',
+  'zip',
+  'xmlformat',
+  'tar',
+  'syntax_completion',
+  'sql_completion',
+  'shada_autoload',
+  'netrwSettings',
+  'netrw',
+  'netrwFileHandlers',
+}
+for _, v in ipairs(disabled_built_ins) do
+  vim.g['loaded_' .. v] = 1
+end
+
 -- Font
 vim.opt.guifont = 'NotoSansM Nerd Font:h13'
 
@@ -202,6 +236,7 @@ require('lazy').setup({
       'MunifTanjim/nui.nvim',
       'nvim-lua/plenary.nvim',
     },
+    event = 'VeryLazy',
     keys = {
       { '<leader>fe', function() require('neo-tree.command').execute({ toggle = true, dir = vim.lsp.buf.list_workspace_folders()[1] or vim.loop.cwd() }) end, desc = 'Explorer NeoTree (cwd)' },
       { '<leader>ge', function() require('neo-tree.command').execute({ source = 'git_status', toggle = true }) end, desc = 'Git explorer' },
