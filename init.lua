@@ -519,14 +519,8 @@ require('lazy').setup({
     end,
   },
   {
-    dir = 'D:/Source/fittencode.nvim',
-    -- dir = function()
-    --   if vim.fn.has('win32') == 1 then
-    --     return 'C:/DataCenter/onWorking/fittencode.nvim'
-    --   else
-    --     return '/home/qx/DataCenter/onWorking/fittencode.nvim'
-    --   end
-    -- end,
+    dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
+    enabled = vim.fn.has('win32') ~= 1,
     config = function()
       local fitten = require('fittencode')
       fitten.setup({
@@ -605,3 +599,14 @@ map({ 'n', 'x' }, 'gw', '*N', 'Search word under cursor')
 -------------------------------------------------------------------------------
 -- 6. Autocmds
 -------------------------------------------------------------------------------
+
+-- If filetype is C++, set tabstop and shiftwidth to 4 in lua
+-- vim.cmd([[
+--   autocmd FileType c,cpp setlocal ts=4 sw=4
+-- ]])
+vim.api.nvim_create_autocmd( 'FileType', { pattern = {'c', 'cpp'},
+    callback = function(args)
+      vim.bo.tabstop = 4
+      vim.bo.shiftwidth = 4
+    end
+})
