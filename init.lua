@@ -523,6 +523,7 @@ require('lazy').setup({
   },
   {
     dir = 'D:/Source/fittencode.nvim',
+    name = 'fittencode.nvim.win',
     enabled = vim.fn.has('win32') == 1,
     config = function()
       local fitten = require('fittencode')
