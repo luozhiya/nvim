@@ -262,7 +262,6 @@ require('lazy').setup({
   },
   {
     'hrsh7th/nvim-cmp',
-    -- enabled = false,
     event = 'VeryLazy',
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
@@ -423,18 +422,9 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
-    -- enabled = false,
     dependencies = {
       'p00f/clangd_extensions.nvim',
-      {
-        'folke/neodev.nvim',
-        opts = {
-          -- library = {
-          --   vim.env.VIMRUNTIME,
-          --   '${3rd}/luv/library',
-          -- },
-        },
-      },
+      'folke/neodev.nvim',
     },
     config = function()
       vim.lsp.set_log_level('OFF')
@@ -471,7 +461,8 @@ require('lazy').setup({
         require('clangd_extensions.inlay_hints').set_inlay_hints()
       end
 
-      local servers = { 'clangd', 'lua_ls' }
+      -- tsserver: `npm install -g typescript typescript-language-server`
+      local servers = { 'clangd', 'lua_ls', 'tsserver' }
       for _, name in ipairs(servers) do
         require('lspconfig')[name].setup({
           on_attach = on_attach,
@@ -521,6 +512,18 @@ require('lazy').setup({
   {
     dir = '/home/qx/DataCenter/onWorking/fittencode.nvim',
     enabled = vim.fn.has('win32') ~= 1,
+    config = function()
+      local fitten = require('fittencode')
+      fitten.setup({
+        log = {
+          level = vim.log.levels.TRACE,
+        },
+      })
+    end,
+  },
+  {
+    dir = 'D:/Source/fittencode.nvim',
+    enabled = vim.fn.has('win32') == 1,
     config = function()
       local fitten = require('fittencode')
       fitten.setup({
