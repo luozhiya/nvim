@@ -371,6 +371,7 @@ require('lazy').setup({
           'query', -- Neovim Treesitter Playground
           'regex',
           'rust',
+          'scheme',
           'toml',
           'typescript',
           'vim',
