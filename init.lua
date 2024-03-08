@@ -611,9 +611,59 @@ map({ 'n', 'x' }, 'gw', '*N', 'Search word under cursor')
 -- vim.cmd([[
 --   autocmd FileType c,cpp setlocal ts=4 sw=4
 -- ]])
-vim.api.nvim_create_autocmd( 'FileType', { pattern = {'c', 'cpp'},
-    callback = function(args)
-      vim.bo.tabstop = 4
-      vim.bo.shiftwidth = 4
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'c', 'cpp' },
+  callback = function(args)
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+  end,
+})
+
+local ft_map = nil
+
+local function load_ft_from_file(file)
+  local count = 0
+  local pre_line = nil
+  for line in io.lines(file) do
+    count = count + 1
+    if count %2 == 1 then
+      ft_map[line] = nil
+    else
+      ---@diagnostic disable-next-line: need-check-nil
+      ft_map[pre_line] = line
     end
+    pre_line = line
+  end
+end
+
+local function load_ft()
+  local file_list = { 'msvc.txt', 'llvm.txt' }
+  for _, file in ipairs(file_list) do
+    local path = vim.fn.stdpath('config') .. '/runtime/' .. file
+    if vim.fn.filereadable(path) == 1 then
+      load_ft_from_file(path)
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  group = vim.api.nvim_create_augroup('FiletypeDetect', { clear = true }),
+  pattern = '*',
+  callback = function(args)
+    if ft_map == nil then
+      ft_map = {}
+      load_ft()
+    end
+    local function try_lookup_setft(query, map)
+      if query == nil or map == nil then return false end
+      if map[query] ~= nil then
+        if vim.fn.did_filetype() == 0 then vim.bo.filetype = map[query] end
+        return true
+      end
+      return false
+    end
+    local name = vim.fn.expand('%:t')
+    if vim.loop.os_uname().sysname == 'Windows_NT' then try_lookup_setft(name, ft_map) end
+  end,
+  desc = 'Filetype Detect',
 })
