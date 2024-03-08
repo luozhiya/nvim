@@ -225,7 +225,7 @@ end
 
 require('lazy').setup({
   {
-    'Mofiqul/vscode.nvim',
+    'luozhiya/vscode.nvim',
     config = function() require('vscode').load() end,
     lazy = false,
     priority = 1000,
