@@ -182,7 +182,7 @@ end
 
 local v10_opts = {
   -- Split Windows
-  splitkeep = 'screen', -- Stable current window line  
+  splitkeep = 'screen', -- Stable current window line
 }
 
 if vim.fn.has('nvim-0.10') == 1 then
@@ -447,7 +447,10 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       'p00f/clangd_extensions.nvim',
-      'folke/neodev.nvim',
+      {
+        'folke/neodev.nvim',
+        config = true,
+      },
     },
     config = function()
       vim.lsp.set_log_level('OFF')
@@ -655,7 +658,7 @@ local function load_ft_from_file(file)
   local pre_line = nil
   for line in io.lines(file) do
     count = count + 1
-    if count %2 == 1 then
+    if count % 2 == 1 then
       ft_map[line] = nil
     else
       ---@diagnostic disable-next-line: need-check-nil
@@ -669,9 +672,7 @@ local function load_ft()
   local file_list = { 'msvc.txt', 'llvm.txt' }
   for _, file in ipairs(file_list) do
     local path = vim.fn.stdpath('config') .. '/runtime/' .. file
-    if vim.fn.filereadable(path) == 1 then
-      load_ft_from_file(path)
-    end
+    if vim.fn.filereadable(path) == 1 then load_ft_from_file(path) end
   end
 end
 
