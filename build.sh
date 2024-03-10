@@ -16,8 +16,6 @@ make_neovim() {
     rm compile_commands.json
     rm -rf build
     rm -rf .deps
-    git pull
-    git rebase origin/master
     make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_EXTRA_FLAGS="-DCMAKE_EXPORT_COMPILE_COMMANDS=True -DCMAKE_INSTALL_PREFIX=${DirPath}/nvim"
     if [ $? -eq 0 ]; then
         return 0
