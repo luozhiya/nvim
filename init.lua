@@ -538,6 +538,15 @@ require('lazy').setup({
     config = function()
       local fitten = require('fittencode')
       fitten.setup({
+        disable_specific_inline_completion = {
+          -- Disable auto-completion for some specific file suffixes by entering them below
+          -- For example, `suffixes = {'lua', 'cpp'}`
+          -- suffixes = { 'lua' },
+        },
+        inline_completion = {
+          -- Enable inline code completion.
+          enable = true,
+        },
         log = {
           level = vim.log.levels.TRACE,
         },
