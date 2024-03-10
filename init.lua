@@ -89,11 +89,8 @@ vim.opt.guifont = 'NotoSansM Nerd Font:h13'
 local vim_opts = {
   -- autochdir = true,
   -- shellslash = true, -- A forward slash is used when expanding file names. -- Bug: neo-tree
-  lazyredraw = not jit.os:find('Windows'), -- no redraws in macros. Disabled for: https://github.com/neovim/neovim/issues/22674
   clipboard = 'unnamedplus', -- Allows neovim to access the system clipboard
   -- Appearance
-  termguicolors = true, -- True color support. set 24-bit RGB color in the TUI
-  shortmess = 'oOcCIFWS', -- See https://neovim.io/doc/user/options.html#'shortmess'
   showmode = false, -- Dont show mode since we have a statusline
   laststatus = 3, -- Status line style
   cmdheight = 0, -- Command-line.
@@ -134,7 +131,6 @@ local vim_opts = {
   foldmethod = 'expr',
   foldexpr = 'nvim_treesitter#foldexpr()',
   -- Split Windows
-  splitkeep = 'screen', -- Stable current window line
   splitbelow = true, -- Put new windows below current
   splitright = true, -- Put new windows right of current
   -- Edit
@@ -155,7 +151,7 @@ local vim_opts = {
   inccommand = 'nosplit', -- preview incremental substitute
   timeout = true, -- Limit the time searching for suggestions to {millisec} milli seconds.
   timeoutlen = 600, -- Determine the behavior when part of a mapped key sequence has been received
-  updatetime = 100, -- Save swap file and trigger CursorHold
+  updatetime = 200, -- Save swap file and trigger CursorHold
   fileformats = 'unix,dos,mac', -- Detect formats
   sessionoptions = { 'buffers', 'curdir', 'tabpages', 'winsize' },
   confirm = true, -- Confirm to save changes before exiting modified buffer
@@ -169,6 +165,30 @@ local vim_opts = {
 }
 for k, v in pairs(vim_opts) do
   vim.opt[k] = v
+end
+
+local v9_opts = {
+  -- Appearance
+  lazyredraw = not jit.os:find('Windows'), -- no redraws in macros. Disabled for: https://github.com/neovim/neovim/issues/22674
+  termguicolors = true, -- True color support. set 24-bit RGB color in the TUI
+  shortmess = 'oOcCIFWS', -- See https://neovim.io/doc/user/options.html#'shortmess'
+}
+
+if vim.fn.has('nvim-0.9') == 1 then
+  for k, v in pairs(v9_opts) do
+    vim.opt[k] = v
+  end
+end
+
+local v10_opts = {
+  -- Split Windows
+  splitkeep = 'screen', -- Stable current window line  
+}
+
+if vim.fn.has('nvim-0.10') == 1 then
+  for k, v in pairs(v10_opts) do
+    vim.opt[k] = v
+  end
 end
 
 -- Remove Neovim tips menu
