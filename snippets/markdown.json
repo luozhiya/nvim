@@ -1,0 +1,15 @@
+{
+    "md": {
+        "prefix": "md",
+        "body": [
+            "---",
+            "layout: post",
+            "title:  \"$0\"",
+            "date:   $1",
+            "categories: $2",
+            "---",
+            ""
+        ],
+        "description": "Code snippet for 'md'"
+    }
+}

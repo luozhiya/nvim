@@ -1,0 +1,17 @@
+{
+    "ng": {
+        "prefix": "ng",
+        "body": [
+            "namespace zycore {",
+            "",
+            "namespace ng {",
+            "",
+            "$0",
+            "",
+            "}",
+            "",
+            "}"
+        ],
+        "description": "Code snippet for 'ng'"
+    }
+}
