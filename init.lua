@@ -290,9 +290,24 @@ require('lazy').setup({
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-cmdline',
       'hrsh7th/cmp-path',
-      'saadparwaiz1/cmp_luasnip',
       'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
       'uga-rosa/cmp-dictionary',
+      {
+        'rafamadriz/friendly-snippets',
+        config = function()
+          -- Sync load luasnip cost ~600ms
+          vim.loop.new_timer():start(
+            1000,
+            0,
+            vim.schedule_wrap(function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+              -- lazy\LuaSnip\doc\luasnip.txt
+              require('luasnip.loaders.from_vscode').lazy_load({ paths = './snippets' })
+            end)
+          )
+        end,
+      },
     },
     config = function()
       local cmp = require('cmp')
@@ -345,7 +360,7 @@ require('lazy').setup({
           ['<down>'] = cmp.mapping.select_next_item(),
           ['<tab>'] = _forward(),
           ['<s-tab>'] = _backward(),
-          ['<cr>'] = cmp.mapping.confirm({ select = false }),
+          ['<cr>'] = cmp.mapping.confirm({ select = true }),
         },
       }
       cmp.setup(opts)
