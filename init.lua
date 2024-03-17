@@ -56,8 +56,8 @@ vim.g.editorconfig = false
 local disabled_built_ins = {
   'gzip',
   'man',
-  'matchit',
-  'matchparen',
+  -- 'matchit',
+  -- 'matchparen',
   'shada_plugin',
   'tarPlugin',
   'zipPlugin',
@@ -299,15 +299,16 @@ require('lazy').setup({
       -- For instance, you can set the `buffer`'s source `group_index` to a larger number
       -- if you don't want to see `buffer` source items while `nvim-lsp` source is available:
       local sources_presets = {
-        { name = 'nvim_lsp', group_index = 1 },
-        { name = 'luasnip', group_index = 1 },
-        { name = 'buffer', group_index = 1 },
+        { name = 'fittencode', group_index = 1 },
+        { name = 'nvim_lsp', group_index = 2 },
+        { name = 'luasnip', group_index = 2 },
+        { name = 'buffer', group_index = 3 },
         {
           name = 'dictionary',
           keyword_length = 4,
-          group_index = 1,
+          group_index = 3,
         },
-        { name = 'path', group_index = 1 },
+        { name = 'path', group_index = 3 },
       }
       local function _forward()
         return cmp.mapping(function(fallback)
@@ -344,6 +345,7 @@ require('lazy').setup({
           ['<down>'] = cmp.mapping.select_next_item(),
           ['<tab>'] = _forward(),
           ['<s-tab>'] = _backward(),
+          ['<cr>'] = cmp.mapping.confirm({ select = false }),
         },
       }
       cmp.setup(opts)
@@ -410,7 +412,7 @@ require('lazy').setup({
           },
         },
       }
-      require('nvim-treesitter.install').prefer_git = true
+      -- require('nvim-treesitter.install').prefer_git = true
       vim.opt.runtimepath:append(path)
       require('nvim-treesitter.configs').setup(opts)
     end,
@@ -550,6 +552,11 @@ require('lazy').setup({
           -- Enable inline code completion.
           enable = true,
         },
+        -- Set the mode of the plugin.
+        -- Available options:
+        -- - 'inline' (default)
+        -- - 'source'
+        completion_mode = 'source',
         log = {
           level = vim.log.levels.TRACE,
         },

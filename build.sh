@@ -12,7 +12,7 @@ make_neovim() {
     fi
     rm -rf nvim
     cd ${DirPath}/neovim
-    make clean
+    # make clean
     rm compile_commands.json
     rm -rf build
     rm -rf .deps

@@ -1,5 +1,18 @@
 " vim
 
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'FittenTech/fittencode.vim'
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+" iunmap <c-l>
+inoremap <C-K> <C-O>:call CodeCompletion()<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 一般的设置
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
