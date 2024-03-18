@@ -360,8 +360,8 @@ require('lazy').setup({
           ['<down>'] = cmp.mapping.select_next_item(),
           ['<tab>'] = _forward(),
           ['<s-tab>'] = _backward(),
-          ['<cr>'] = cmp.mapping.confirm({ select = true }),
-        },
+          ['<cr>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
+        }
       }
       cmp.setup(opts)
 
@@ -585,6 +585,20 @@ require('lazy').setup({
     config = function()
       local fitten = require('fittencode')
       fitten.setup({
+        disable_specific_inline_completion = {
+          -- Disable auto-completion for some specific file suffixes by entering them below
+          -- For example, `suffixes = {'lua', 'cpp'}`
+          -- suffixes = { 'lua' },
+        },
+        inline_completion = {
+          -- Enable inline code completion.
+          enable = true,
+        },
+        -- Set the mode of the plugin.
+        -- Available options:
+        -- - 'inline' (default)
+        -- - 'source'
+        completion_mode = 'source',
         log = {
           level = vim.log.levels.TRACE,
         },
