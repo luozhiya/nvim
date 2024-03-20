@@ -315,8 +315,8 @@ require('lazy').setup({
       -- if you don't want to see `buffer` source items while `nvim-lsp` source is available:
       local sources_presets = {
         { name = 'fittencode', group_index = 1 },
-        { name = 'nvim_lsp', group_index = 2 },
-        { name = 'luasnip', group_index = 2 },
+        { name = 'nvim_lsp', group_index = 1 },
+        { name = 'luasnip', group_index = 1 },
         { name = 'buffer', group_index = 3 },
         {
           name = 'dictionary',
@@ -360,7 +360,7 @@ require('lazy').setup({
           ['<down>'] = cmp.mapping.select_next_item(),
           ['<tab>'] = _forward(),
           ['<s-tab>'] = _backward(),
-          ['<cr>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true }),
+          ['<cr>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = false }),
         }
       }
       cmp.setup(opts)
