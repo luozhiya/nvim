@@ -51,7 +51,9 @@ vim.g.loaded_pythonx_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
-vim.g.editorconfig = false
+
+-- EditorConfig is enabled by default.
+-- vim.g.editorconfig = false
 
 local disabled_built_ins = {
   'gzip',
@@ -598,7 +600,7 @@ require('lazy').setup({
         -- Available options:
         -- - 'inline' (default)
         -- - 'source'
-        completion_mode = 'source',
+        completion_mode = 'inline',
         log = {
           level = vim.log.levels.TRACE,
         },
